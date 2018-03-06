@@ -16,7 +16,7 @@ class SinglyLinkedList:
 
     def prepend(self, data):
         # Time complexity O(1)
-        self.head = None(data, self.head)
+        self.head = Node(data, self.head)
         self.n += 1
 
     def append(self, data):
