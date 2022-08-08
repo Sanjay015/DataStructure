@@ -1,200 +1,142 @@
-class TreeNode:
-    def __init__(self,key,val,left=None,right=None,parent=None):
-        self.key = key
-        self.payload = val
-        self.leftChild = left
-        self.rightChild = right
-        self.parent = parent
+class BinarySearchTreeNode:
 
-    def hasLeftChild(self):
-        return self.leftChild
+    def __init__(self, data):
+        self.data = data
+        self.left = None
+        self.right = None
 
-    def hasRightChild(self):
-        return self.rightChild
+    def add_child(self, data):
+        if self.data == data:
+            return
 
-    def isLeftChild(self):
-        return self.parent and self.parent.leftChild == self
-
-    def isRightChild(self):
-        return self.parent and self.parent.rightChild == self
-
-    def isRoot(self):
-        return not self.parent
-
-    def isLeaf(self):
-        return not (self.rightChild or self.leftChild)
-
-    def hasAnyChildren(self):
-        return self.rightChild or self.leftChild
-
-    def hasBothChildren(self):
-        return self.rightChild and self.leftChild
-
-    def replaceNodeData(self,key,value,lc,rc):
-        self.key = key
-        self.payload = value
-        self.leftChild = lc
-        self.rightChild = rc
-        if self.hasLeftChild():
-            self.leftChild.parent = self
-        if self.hasRightChild():
-            self.rightChild.parent = self
-
-
-class BinarySearchTree:
-
-    def __init__(self):
-        self.root = None
-        self.size = 0
-
-    def length(self):
-        return self.size
-
-    def __len__(self):
-        return self.size
-
-    def put(self,key,val):
-        if self.root:
-            self._put(key,val,self.root)
-        else:
-            self.root = TreeNode(key,val)
-        self.size = self.size + 1
-
-    def _put(self,key,val,currentNode):
-        if key < currentNode.key:
-            if currentNode.hasLeftChild():
-                   self._put(key,val,currentNode.leftChild)
+        if data < self.data:
+            # add to left sub tree
+            if self.left:
+                self.left.add_child(data)
             else:
-                   currentNode.leftChild = TreeNode(key,val,parent=currentNode)
+                self.left = BinarySearchTreeNode(data)
         else:
-            if currentNode.hasRightChild():
-                   self._put(key,val,currentNode.rightChild)
+            # add to right subtree
+            if self.right:
+                self.right.add_child(data)
             else:
-                   currentNode.rightChild = TreeNode(key,val,parent=currentNode)
+                self.right = BinarySearchTreeNode(data)
 
-    def __setitem__(self,k,v):
-       self.put(k,v)
+    def in_order_traversal(self):
+        elements = []
 
-    def get(self,key):
-       if self.root:
-           res = self._get(key,self.root)
-           if res:
-                  return res.payload
-           else:
-                  return None
-       else:
-           return None
+        # Left Root Right
+        # visit left sub tree
+        if self.left:
+            elements.extend(self.left.in_order_traversal())
+        # visit base node
+        elements.append(self.data)
+        # visit right sub tree
+        if self.right:
+            elements.extend(self.right.in_order_traversal())
 
-    def _get(self,key,currentNode):
-       if not currentNode:
-           return None
-       elif currentNode.key == key:
-           return currentNode
-       elif key < currentNode.key:
-           return self._get(key,currentNode.leftChild)
-       else:
-           return self._get(key,currentNode.rightChild)
+        return elements
 
-    def __getitem__(self,key):
-       return self.get(key)
+    def post_order_traversal(self):
+        elements = []
 
-    def __contains__(self,key):
-       if self._get(key,self.root):
-           return True
-       else:
-           return False
+        # Left Right Root
+        # visit left sub tree
+        if self.left:
+            elements.extend(self.left.in_order_traversal())
+        # visit right sub tree
+        if self.right:
+            elements.extend(self.right.in_order_traversal())
+        # visit base node
+        elements.append(self.data)
 
-    def delete(self,key):
-      if self.size > 1:
-         nodeToRemove = self._get(key,self.root)
-         if nodeToRemove:
-             self.remove(nodeToRemove)
-             self.size = self.size-1
-         else:
-             raise KeyError('Error, key not in tree')
-      elif self.size == 1 and self.root.key == key:
-         self.root = None
-         self.size = self.size - 1
-      else:
-         raise KeyError('Error, key not in tree')
+        return elements
 
-    def __delitem__(self,key):
-       self.delete(key)
+    def pre_order_traversal(self):
+        # Root Left Right
+        # visit base node
+        elements = [self.data]
+        # visit left sub tree
+        if self.left:
+            elements.extend(self.left.in_order_traversal())
+        # visit right sub tree
+        if self.right:
+            elements.extend(self.right.in_order_traversal())
 
-    def spliceOut(self):
-       if self.isLeaf():
-           if self.isLeftChild():
-                  self.parent.leftChild = None
-           else:
-                  self.parent.rightChild = None
-       elif self.hasAnyChildren():
-           if self.hasLeftChild():
-                  if self.isLeftChild():
-                     self.parent.leftChild = self.leftChild
-                  else:
-                     self.parent.rightChild = self.leftChild
-                  self.leftChild.parent = self.parent
-           else:
-                  if self.isLeftChild():
-                     self.parent.leftChild = self.rightChild
-                  else:
-                     self.parent.rightChild = self.rightChild
-                  self.rightChild.parent = self.parent
+        return elements
 
-    def findSuccessor(self):
-      succ = None
-      if self.hasRightChild():
-          succ = self.rightChild.findMin()
-      else:
-          if self.parent:
-                 if self.isLeftChild():
-                     succ = self.parent
-                 else:
-                     self.parent.rightChild = None
-                     succ = self.parent.findSuccessor()
-                     self.parent.rightChild = self
-      return succ
+    def search(self, value):
+        if self.data == value:
+            return True
+        if value < self.data:
+            # value might be in left subtree
+            if self.left:
+                return self.left.search(value)
+            else:
+                return False
+        if value > self.data:
+            # value might be in right sub tree
+            if self.right:
+                return self.right.search(value)
+            else:
+                return False
 
-    def findMin(self):
-      current = self
-      while current.hasLeftChild():
-          current = current.leftChild
-      return current
+    def find_min(self):
+        if self.left is None:
+            return self.data
+        return self.left.find_min()
 
-    def remove(self,currentNode):
-         if currentNode.isLeaf(): #leaf
-           if currentNode == currentNode.parent.leftChild:
-               currentNode.parent.leftChild = None
-           else:
-               currentNode.parent.rightChild = None
-         elif currentNode.hasBothChildren(): #interior
-           succ = currentNode.findSuccessor()
-           succ.spliceOut()
-           currentNode.key = succ.key
-           currentNode.payload = succ.payload
+    def find_max(self):
+        if self.right is None:
+            return self.data
+        return self.right.find_min()
 
-         else: # this node has one child
-           if currentNode.hasLeftChild():
-             if currentNode.isLeftChild():
-                 currentNode.leftChild.parent = currentNode.parent
-                 currentNode.parent.leftChild = currentNode.leftChild
-             elif currentNode.isRightChild():
-                 currentNode.leftChild.parent = currentNode.parent
-                 currentNode.parent.rightChild = currentNode.leftChild
-             else:
-                 currentNode.replaceNodeData(currentNode.leftChild.key,
-                                    currentNode.leftChild.payload,
-                                    currentNode.leftChild.leftChild,
-                                    currentNode.leftChild.rightChild)
-           else:
-             if currentNode.isLeftChild():
-                 currentNode.rightChild.parent = currentNode.parent
-                 currentNode.parent.leftChild = currentNode.rightChild
-             elif currentNode.isRightChild():
-                 currentNode.rightChild.parent = currentNode.parent
-                 currentNode.parent.rightChild = currentNode.rightChild
-             else:
-                 currentNode.replaceNodeData(currentNode.rightChild.key,
-                                    currentNode.rightChild.payload,
-                                    currentNode.rightChild.leftChild,
-                                    currentNode.rightChild.rightChild)
+    def delete(self, value):
+        if value < self.data:
+            if self.left:
+                self.left = self.left.delete(value)
+        elif value > self.data:
+            if self.right:
+                self.right = self.right.delete(value)
+        else:
+            if self.left is None and self.right is None:
+                return None
+            if self.left is None:
+                return self.right
+            if self.right is None:
+                return self.left
+            min_val = self.right.find_min()
+            self.data = min_val
+            self.right = self.right.delete(min_val)
+        return self
+
+
+def build_tree(elements):
+    root = BinarySearchTreeNode(elements[0])
+    for i in range(1, len(elements)):
+        root.add_child(elements[i])
+
+    return root
+
+
+if __name__ == '__main__':
+    nums = [17, 4, 1, 9, 4, 20, 18, 34, 1, 23]
+    num_tree = build_tree(nums)
+    print('Min Max: ', num_tree.find_max(), num_tree.find_min())
+    print('In Order: ', num_tree.in_order_traversal())
+    print('Pre Order: ', num_tree.pre_order_traversal())
+    print('Post Order: ', num_tree.post_order_traversal())
+    num_tree.delete(20)
+    print('Delete 20: ', num_tree.in_order_traversal())
+    num_tree.delete(17)
+    print('Delete 17: ', num_tree.in_order_traversal())
+    num_tree.delete(9)
+    print('Delete 9: ', num_tree.in_order_traversal())
+    countries = [
+        'India', 'Pakistan', 'UK', 'Germany',
+        'USA', 'China', 'India', 'UK', 'USA',
+    ]
+    countries_tree = build_tree(countries)
+    print(countries_tree.in_order_traversal())
+    print(countries_tree.search('China'))
+    print(countries_tree.search('india'))

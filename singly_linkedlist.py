@@ -1,149 +1,176 @@
 class Node:
-    def __init__(self, data=None, next_=None):
+
+    def __init__(self, data=None, _next=None):
+        self._nextNode = _next
         self.data = data
-        self.next_ = next_
 
     def __str__(self):
         return '{}'.format(self.data)
 
-class SinglyLinkedList:
+    @property
+    def nextNode(self):
+        return self._nextNode
+
+    @nextNode.setter
+    def nextNode(self, node):
+        self._nextNode = node
+
+
+class LinkedList:
+
     def __init__(self):
         self.head = None
-        self.n = 0
+        self._size = 0
 
-    def is_empty(self):
+    def __len__(self):
+        return self._size
+
+    def __getitem__(self, items):
+        return self.getByIndex(items)
+
+    def __setitem__(self, index, data):
+        return self.insert(index, data)
+
+    def __delitem__(self, index):
+        return self.deleteByIndex(index)
+
+    def __contains__(self, item):
+        return self.search(item)
+
+    def __str__(self):
+        output = ''
+        curr = self.head
+        while curr:
+            if output:
+                output = '{}, {}'.format(output, str(curr))
+            else:
+                output = '{}'.format(str(curr))
+            curr = curr.nextNode
+        return '[{}]'.format(output)
+
+    def isEmpty(self):
         return self.head is None
 
     def prepend(self, data):
-        # Time complexity O(1)
-        self.head = Node(data, self.head)
-        self.n += 1
+        self.head = Node(data=data, _next=self.head)
+        self._size += 1
 
     def append(self, data):
-        # Complexity is always O(n)
         if self.head is None:
             self.prepend(data)
             return
-        curr_node = self.head
-        while curr_node.next_:
-            curr_node = curr_node.next_
-        curr_node.next_ = Node(data)
-        self.n += 1
+        node = Node(data=data)
+        current_node = self.head
+        while current_node.nextNode:
+            current_node = current_node.nextNode
+        current_node.nextNode = node
+        self._size += 1
 
-    def insert(self, data, index):
-        # Time complexity O(n)
-        counter = 1
+    def insert(self, index, data):
         if index == 0:
             self.prepend(data)
             return
+
         if len(self) <= index:
-            print("""Length of list is {} (index 0 - {}), but mentioned\
-                     index is  {}. Impossible insert operation""".format(
-                        len(self), len(self) - 1, index))
-            return
-        curr_node = self.head
+            raise IndexError(
+                ('length of list is: {}, but you are trying to insert value '
+                 'at index: {}').format(len(self), index))
+
+        counter = 1
+        current_node = self.head
         while counter < index:
-            curr_node = curr_node.next_
+            current_node = current_node.nextNode
             counter += 1
-        temp_node = curr_node.next_
-        curr_node.next_ = Node(data, temp_node)
-        self.n += 1
+        node = Node(data=data, _next=current_node.nextNode)
+        current_node.nextNode = node
+        self._size += 1
 
     def pop(self):
-        # Time complexity O(n)
-        if self.is_empty():
-            print('Empty list. Nothing to pop.')
+        if self.isEmpty():
             return
-        elif self.n == 1:
+        if len(self) == 1:
             self.head = None
-            self.n -= 1
+            self._size -= 1
             return
 
-        curr_node = self.head
-        prev_node = curr_node
-        while curr_node.next_:
-            prev_node = curr_node
-            curr_node = curr_node.next_
-        temp_node = prev_node.next_
-        prev_node.next_ = None
-        self.n -= 1
-        return temp_node
+        current_node = self.head
+        prev_node = current_node
+        while current_node.nextNode:
+            prev_node = current_node
+            current_node = current_node.nextNode
+        tmp_node = prev_node.nextNode
+        prev_node.nextNode = None
+        self._size -= 1
+        return tmp_node
 
-    def search(self, data):
-        # Time complexity - O(n)
-        index = 0
-        curr_node = self.head
-        while curr_node and curr_node.next_ != data:
-            curr_node = curr_node.next_
-        if curr_node:
-            print('Found {} at index - {}'.format(data, index))
+    def getByIndex(self, index):
+        if self.isEmpty():
+            return
+        if index >= len(self):
+            raise IndexError(
+                ('length of list is: {}, but you are trying to get value '
+                 'at index: {}').format(len(self), index))
+        counter = 0
+        current_node = self.head
+        while counter != index:
+            current_node = current_node.nextNode
+            counter += 1
+        return current_node
 
-    def remove_on_index(self, index=0):
-        # Time complexity O(n)
-        if self.is_empty:
-            print('Empty list. Nothing to remove.')
+    def deleteByIndex(self, index):
+        if self.isEmpty():
             return
-        elif len(self) <= index:
-            print("""Length of list is {} (index 0 - {}), but mentioned\
-                     index is  {}. Impossible insert operation""".format(
-                        len(self), len(self) - 1, index))
-            return
+        if index >= len(self):
+            raise IndexError(
+                ('length of list is: {}, but you are trying to get value '
+                 'at index: {}').format(len(self), index))
 
         if index == 0:
-            self.head = self.head.next_
-            self.n -= 1
+            self.head = self.head.nextNode
+            self._size -= 1
             return
+
         counter = 0
-        curr_node = self.head
-        prev_node = curr_node
-        while counter < index:
-            prev_node = curr_node
-            curr_node = curr_node.next_
+        current_node = self.head
+        prev_node = current_node
+        while counter != index:
+            prev_node = current_node
+            current_node = current_node.nextNode
             counter += 1
-        prev_node.next_ = curr_node.next_
-        self.n -= 1
+        node_to_delete = current_node
+        prev_node.nextNode = current_node.nextNode
+        self._size -= 1
+        return node_to_delete
 
-
-    def remove_on_data(self, data):
-        # Time complexity O(n)
-        if self.is_empty:
-            print('Empty List. Nothing to remove.')
-            return
-
-        curr_node = self.head
-        prev_node = None
-        while curr_node and curr_node.next_ != data:
-            prev_node = curr_node
-            curr_node = curr_node.next_
-        if prev_node is None:
-            self.head = curr_node.next_
-            self.n += 1
-        elif curr_node:
-            prev_node.next_ = curr_node.next_
-            self.n += 1
-        elif:
-            print('No node to removed. Data {} not found iin list.'.format(data))
+    def search(self, item):
+        current_node = self.head
+        while current_node:
+            if current_node.data == item:
+                return True
+            current_node = current_node.nextNode
+        return False
 
     def reverse(self):
-        # Time complexity - O(n)
-        curr_node = self.head
+        current_node = self.head
         prev_node = None
-        while curr_node:
-            next_node = curr_node.next_
-            curr_node.next_ = prev_node
-            prev_node = curr_node
-            curr_node = next_node
+        while current_node:
+            next_node = current_node.nextNode
+            current_node.nextNode = prev_node
+            prev_node = current_node
+            current_node = next_node
+
         self.head = prev_node
 
-    def __len__(self):
-        # Time complexity - O(1)
-        return self.n
 
-    def __str__(self):
-        sll = ['head']
-        curr = self.head
-        while curr:
-            sll.append('{}'.format(curr))
-            curr = curr.next_
-        return '--->'.join(sll)
-        
+if __name__ == '__main__':
+    linked_list = LinkedList()
+    linked_list.append(10)
+    linked_list.append(20)
+    linked_list.append(30)
+    linked_list.prepend(5)
+    linked_list.prepend(2)
+    print(linked_list)
+    print('Get item--: ', linked_list[4])
+    print('----search-', 50 in linked_list)
+    linked_list.reverse()
+    print('----reverse-', linked_list)
