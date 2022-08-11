@@ -36,7 +36,7 @@ class Queue:
         curr = self._front
         while curr:
             if output:
-                output = '{}, {}'.format(output, str(curr))
+                output = '{}->{}'.format(output, str(curr))
             else:
                 output = '{}'.format(str(curr))
             curr = curr.nextNode
@@ -61,7 +61,7 @@ class Queue:
         self._rear = node
 
     def dequeue(self):
-        if self.isEmpty():
+        if self.is_empty():
             return
 
         node = self._front
@@ -71,10 +71,10 @@ class Queue:
 
         self._size -= 1
 
-    def isEmpty(self):
+    def is_empty(self):
         return self._front is None
 
-    def isFull(self):
+    def is_full(self):
         return len(self) == self.maxSize
 
     def peek(self):
@@ -94,11 +94,11 @@ if __name__ == '__main__':
     q.enqueue('E')
     q.enqueue('F')
     print(q)
-    print(len(q), q.isFull())
+    print(len(q), q.is_full())
     print('Front: ', q.front(), 'Rear: ', q.rear())
     q.dequeue()
     print(q)
-    print(len(q), q.isFull())
+    print(len(q), q.is_full())
     print('Front: ', q.front(), 'Rear: ', q.rear())
     print(q.display())
 
