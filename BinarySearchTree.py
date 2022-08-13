@@ -1,13 +1,13 @@
 class BinarySearchTreeNode:
 
-    def __init__(self, data):
+    def __init__(self, data=None):
         self.data = data
         self.parent = None
         self.left = None
         self.right = None
 
     def __str__(self):
-        return self.display()
+        return self.__display()
 
     def height(self):
         """Returns the height of tree."""
@@ -62,10 +62,10 @@ class BinarySearchTreeNode:
         # Left Right Root
         # visit left sub tree
         if self.left:
-            elements.extend(self.left.in_order_traversal())
+            elements.extend(self.left.post_order_traversal())
         # visit right sub tree
         if self.right:
-            elements.extend(self.right.in_order_traversal())
+            elements.extend(self.right.post_order_traversal())
         # visit base node
         elements.append(self.data)
 
@@ -78,10 +78,10 @@ class BinarySearchTreeNode:
         elements = [self.data]
         # visit left sub tree
         if self.left:
-            elements.extend(self.left.in_order_traversal())
+            elements.extend(self.left.pre_order_traversal())
         # visit right sub tree
         if self.right:
-            elements.extend(self.right.in_order_traversal())
+            elements.extend(self.right.pre_order_traversal())
 
         return elements
 
@@ -228,20 +228,20 @@ class BinarySearchTreeNode:
         _diameter = max(left_diameter, right_diameter)
         return max(left_height + right_height + 1, _diameter)
 
-    def display(self, output='', node_pos='Root', level=0):
+    def __display(self, output='', node_pos='Root', level=0):
         """Display human readable BST."""
         if not self:
-            return
+            return output
         parent = None
         if self.parent:
             parent = self.parent.data
         output += '{}{}-->{} [parent={}]\n'.format(
             '|  ' * level, node_pos, self.data, parent)
         if self.left:
-            output = self.left.display(
+            output = self.left.__display(
                 output=output, node_pos='Left', level=level + 1)
         if self.right:
-            output = self.right.display(
+            output = self.right.__display(
                 output=output, node_pos='Right', level=level + 1)
         return output
 
@@ -283,11 +283,103 @@ class BinarySearchTreeNode:
 
 
 def build_bst(elements):
-    root = BinarySearchTreeNode(elements[0])
+    root = BinarySearchTreeNode(data=elements[0])
     for i in range(1, len(elements)):
         root.add_node(elements[i])
 
     return root
+
+
+def build_tree_from_give_inorder(in_order, start=0, end=None):
+    if not len(in_order):
+        return None
+
+    if end is None:
+        end = len(in_order) - 1
+
+    if start > end:
+        return None
+
+    size = len(in_order[start:end])
+    middle = size // 2
+    root = BinarySearchTreeNode(data=in_order[middle])
+
+    root.left = build_tree_from_give_inorder(
+        in_order[0: middle], start=0, end=middle)
+
+    root.right = build_tree_from_give_inorder(
+        in_order[middle + 1:], start=0, end=size)
+    return root
+
+
+def build_tree_from_give_preorder(
+        pre_order, index=0, data=None, minimum=None, maximum=None):
+    if not len(pre_order):
+        return None, index
+
+    if index >= len(pre_order):
+        return None, index
+
+    if data is None:
+        data = pre_order[0]
+
+    if minimum is None:
+        minimum = -float('inf')
+
+    if maximum is None:
+        maximum = float('inf')
+
+    root = None
+    if minimum < data < maximum:
+        root = BinarySearchTreeNode(data=data)
+        index += 1
+
+        if index < len(pre_order):
+            root.left, index = build_tree_from_give_preorder(
+                pre_order, index=index, data=pre_order[index],
+                minimum=minimum, maximum=data)
+
+            root.right, index = build_tree_from_give_preorder(
+                pre_order, index=index, data=pre_order[index],
+                minimum=data, maximum=maximum)
+
+    return root, index
+
+
+def build_tree_from_give_postorder(
+        post_order, index=None, data=None, minimum=None, maximum=None):
+    if not len(post_order):
+        return None, index
+
+    if index is None:
+        index = len(post_order) - 1
+
+    if index < 0:
+        return None, index
+
+    if data is None:
+        data = post_order[index]
+
+    if minimum is None:
+        minimum = -float('inf')
+
+    if maximum is None:
+        maximum = float('inf')
+
+    root = None
+    if minimum < data < maximum:
+        root = BinarySearchTreeNode(data=data)
+        index -= 1
+
+        if index >= 0:
+            root.right, index = build_tree_from_give_postorder(
+                post_order, index=index, data=post_order[index],
+                minimum=data, maximum=maximum)
+
+            root.left, index = build_tree_from_give_postorder(
+                post_order, index=index, data=post_order[index],
+                minimum=minimum, maximum=data)
+    return root, index
 
 
 if __name__ == '__main__':
@@ -295,6 +387,7 @@ if __name__ == '__main__':
     num_tree = build_bst(nums)
     print('Min Max: ', num_tree.find_max(), num_tree.find_min())
     print('In Order: ', num_tree.in_order_traversal())
+    print(num_tree)
     print('Pre Order: ', num_tree.pre_order_traversal())
     print('Post Order: ', num_tree.post_order_traversal())
     num_tree.delete(20)
@@ -306,3 +399,19 @@ if __name__ == '__main__':
     print('Is Valid BST: ', num_tree.is_valid_bst())
     print(num_tree)
     print('Max Sum Path: ', num_tree.max_path_sum())
+
+    print('========================================')
+    _inorder = [1, 4, 9, 15, 17, 18, 20, 23, 34, 50, 55, 90]
+    dataTree = build_tree_from_give_inorder(_inorder)
+    print(dataTree.in_order_traversal())
+    print(dataTree)
+
+    _pre_order = [10, 5, 1, 7, 40, 50]
+    dataTree, _ = build_tree_from_give_preorder(_pre_order)
+    print(dataTree.pre_order_traversal())
+    print(dataTree)
+
+    post = [1, 7, 5, 50, 40, 10]
+    dataTree, _ = build_tree_from_give_postorder(post)
+    print(dataTree.in_order_traversal())
+    print(dataTree)
