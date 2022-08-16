@@ -1,3 +1,6 @@
+from DSQueue import DSQueue
+
+
 class BinarySearchTreeNode:
 
     def __init__(self, data=None):
@@ -84,6 +87,23 @@ class BinarySearchTreeNode:
             elements.extend(self.right.pre_order_traversal())
 
         return elements
+
+    def level_order_traversal_or_bfs(self):
+        if not self:
+            return
+
+        result = []
+        q = DSQueue.Queue()
+        q.enqueue(self)
+        while not q.is_empty():
+            node = q.dequeue()
+            result.append(node.data.data)
+            if node.data.left:
+                q.enqueue(node.data.left)
+            if node.data.right:
+                q.enqueue(node.data.right)
+
+        return result
 
     def search(self, value):
         """Search a value in BST."""
@@ -390,6 +410,7 @@ if __name__ == '__main__':
     print(num_tree)
     print('Pre Order: ', num_tree.pre_order_traversal())
     print('Post Order: ', num_tree.post_order_traversal())
+    print('BFS: ', num_tree.level_order_traversal_or_bfs())
     num_tree.delete(20)
     print('2nd Largest: ', num_tree.kth_largest(2))
     print('Least Common Ancestor: \n', num_tree.least_common_ancestor(

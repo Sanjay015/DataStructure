@@ -4,12 +4,29 @@ class Node:
         self.next = next_
         self.data = data
 
+    def __str__(self):
+        return '{}'.format(self.data)
+
 
 class Stack:
 
     def __init__(self, tos=None):
         self.tos = tos
         self.length = 0
+
+    def __str__(self):
+        if not self.tos:
+            return ''
+
+        result = ''
+        node = self.tos
+        while node:
+            if result:
+                result = '{}, {}'.format(result, node)
+            else:
+                result = '{}'.format(node)
+            node = node.next
+        return result
 
     def push(self, data):
         node = Node(data=data, next_=self.tos)

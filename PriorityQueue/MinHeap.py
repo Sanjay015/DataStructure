@@ -28,6 +28,9 @@ class MinHeap:
             return True
         return False
 
+    def is_empty(self):
+        return self.__size == 0
+
     def __swap(self, fpos, spos):
         self.heap[fpos], self.heap[spos] = self.heap[spos], self.heap[fpos]
 
@@ -110,6 +113,11 @@ class MinHeap:
     def get_min(self):
         if self.__size:
             return self.heap[self.__front]
+
+    def clear(self):
+        self.heap = [0]
+        self.__size = 0
+        self.__front = 1
 
 
 if __name__ == '__main__':

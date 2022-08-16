@@ -22,7 +22,7 @@ class Node:
 
 class Queue:
 
-    def __init__(self, max_size):
+    def __init__(self, max_size=100):
         self._front = None
         self._rear = None
         self._size = 0
@@ -70,6 +70,7 @@ class Queue:
             self._rear = None
 
         self._size -= 1
+        return node
 
     def is_empty(self):
         return self._front is None
@@ -85,7 +86,7 @@ class Queue:
 
 
 if __name__ == '__main__':
-    q = Queue(100)
+    q = Queue()
     q.enqueue('X')
     q.enqueue('A')
     q.enqueue('B')
