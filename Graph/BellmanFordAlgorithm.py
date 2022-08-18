@@ -120,7 +120,7 @@ class Graph:
         The standard Bellman-Ford algorithm reports the shortest path only if
         there are no negative weight cycles
 
-        time complexity: O(V * E)
+        Time Complexity: O(V * E)
         """
         # In our case we already have vertex with default distance as `inf`
         # No need to run a loop to set all vertices distance to `inf`
