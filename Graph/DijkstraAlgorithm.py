@@ -152,7 +152,7 @@ class Graph:
         return result
 
     def dijkstra_algorithm(self, start_vertex, end_vertex):
-        """time complexity: O(V ^ 2)"""
+        """Time Complexity: O(V ^ 2)"""
         # Set the distance for the start node to zero
         start = self.get_vertex(start_vertex)
         start.distance = 0
