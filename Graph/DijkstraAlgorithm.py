@@ -151,7 +151,7 @@ class Graph:
             self._get_shortest_path(vertex.previous, result=result)
         return result
 
-    def dijkstra(self, start_vertex, end_vertex):
+    def dijkstra_algorithm(self, start_vertex, end_vertex):
         # Set the distance for the start node to zero
         start = self.get_vertex(start_vertex)
         start.distance = 0
@@ -198,6 +198,38 @@ class Graph:
             'weight': end_vertex.distance,
         }
 
+    def bellman_ford_algorithm(self, source):
+        """Dijkstra algorithm does not work with negative edge cost.
+        Assume cost to vertex V is very highly negative from some other vertex
+        V1, in this case path from V2 to V1 is back to V is better that going
+        from V2 to V is without using V1. A combination of Dijkstra and
+        unweighted algorithm will solve the problem. Find all vertices as:
+            distance to V1 + weight(v, w) < old distance to w
+        """
+        distance = {}
+
+        for vertex in self:
+            # Assuming all the nodes are very far
+            distance[vertex.get_id()] = float('inf')
+
+        distance[source] = 0
+
+        for vertex in self:
+            for neighbor in vertex.get_connections():
+                vertex_weight = distance[vertex.get_id()]
+                w = vertex.get_weight(neighbor)
+                nw = distance[neighbor.get_id()]
+                if vertex_weight != float('inf') and vertex_weight + w < nw:
+                    distance[neighbor.get_id()] = vertex_weight + w
+
+        for v in self:
+            for n in v.get_connections():
+                try:
+                    assert distance[v.get_id()] <= distance[n.get_id()] + v.get_weight(n)
+                except Exception:
+                    print(v.get_id(), n.get_id(), distance[v.get_id()], distance[n.get_id()], v.get_weight(n))
+        print('------', distance)
+
 
 if __name__ == '__main__':
     g = Graph()
@@ -207,13 +239,21 @@ if __name__ == '__main__':
     g.add_vertex('d')
     g.add_vertex('e')
 
-    g.add_edge('a', 'b', 4)
-    g.add_edge('a', 'c', 1)
-    g.add_edge('c', 'b', 2)
-    g.add_edge('b', 'e', 4)
-    g.add_edge('c', 'd', 4)
-    g.add_edge('d', 'e', 4)
-    g.dfs_traversal()
-    g.bfs_traversal()
+    # g.add_edge('a', 'b', 4)
+    # g.add_edge('a', 'c', 1)
+    # g.add_edge('c', 'b', 2)
+    # g.add_edge('b', 'e', 4)
+    # g.add_edge('c', 'd', 4)
+    # g.add_edge('d', 'e', 4)
+    # g.dfs_traversal()
+    # g.bfs_traversal()
 
-    print(g.dijkstra('a', 'e'))
+    # print(g.dijkstra_algorithm('a', 'e'))
+    g.add_edge('a', 'b', 2)
+    g.add_edge('a', 'c', 1)
+    g.add_edge('c', 'b', 5)
+    g.add_edge('b', 'e', 5)
+    g.add_edge('c', 'd', 4)
+    g.add_edge('d', 'e', -1)
+
+    print(g.bellman_ford_algorithm('a'))
