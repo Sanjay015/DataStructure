@@ -1,21 +1,20 @@
 class ADTDisjointSet:
 
-    def __init__(self, elements):
+    def __init__(self):
         self.parent = {}
         # stores the depth of trees
         self.rank = {}
-        self._elements = elements
         self.make_set()
 
-    def __str__(self):
-        result = ''
-        for i in self._elements:
-            result = '{}{}, '.format(result, self.find(i))
-        return result
-
-    def make_set(self):
+    def make_set(self, elements=None):
         """create `n` disjoint sets (one for each item)"""
-        for element in self._elements:
+        if not elements:
+            return
+
+        if isinstance(elements, (list, tuple)):
+            elements = [elements]
+
+        for element in elements:
             self.parent[element] = element
             self.rank[element] = 0
 
@@ -50,7 +49,8 @@ class ADTDisjointSet:
 
 if __name__ == '__main__':
     universe = ['a', 'b', 'c', 'd', 'e', 'h', 'i']
-    adt = ADTDisjointSet(universe)
+    adt = ADTDisjointSet()
+    adt.make_set(universe)
     adt.union('b', 'd')
     adt.union('h', 'b')
     print(adt.find('h'))
