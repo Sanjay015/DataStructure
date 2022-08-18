@@ -184,9 +184,9 @@ class Graph:
         Time Complexity: O(ELogE + ELogV)
         """
         edges = []
-        nodes = []
+        adt = ADTDisjointSet()
         for vertex in self:
-            nodes.append(vertex.get_id())
+            adt.make_set(vertex.get_id())
             for neighbor in vertex.get_connections():
                 weight = vertex.get_weight(neighbor)
                 vid = vertex.get_id()
@@ -196,7 +196,6 @@ class Graph:
         # Sort edges by their weight
         edges = sorted(edges, key=lambda item: item[0])
 
-        adt = ADTDisjointSet(nodes)
         minimum_spanning_tree = set()
         cost = 0
         for edge in edges:
