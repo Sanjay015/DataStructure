@@ -30,6 +30,17 @@ class Trie:
             current_node = current_node.children[character]
         return current_node.is_end_of_word
 
+    def starts_with(self, prefix):
+        if prefix == '':
+            return True
+
+        current_node = self.root
+        for element in prefix:
+            if element not in current_node:
+                return False
+            current_node = current_node[element]
+        return True
+
 
 if __name__ == '__main__':
     trie = Trie()
